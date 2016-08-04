@@ -96,6 +96,7 @@ options = [
         'help': "Password of the OpenERP user. Default = 'demo'"},
 ]
 
+
 def stdout_write(string):
     '''Wrapper on sys.stdout.write'''
     sys.stdout.write(string.encode(sys.stdout.encoding or 'utf-8', 'replace'))
@@ -112,6 +113,7 @@ def stderr_write(string):
     sys.stderr.write(string.encode(sys.stdout.encoding or 'utf-8', 'replace'))
     sys.stdout.flush()
     return True
+
 
 def main(options, arguments):
 

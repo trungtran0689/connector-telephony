@@ -82,12 +82,12 @@ class PhoneCommon(models.AbstractModel):
 #            base_url = params.get_param('crm.voip.ucp_url', default='http://localhost/ucp?quietmode=1&module=cdr&command=download&msgid={odoo_uniqueid}&type=download&format=wav&ext={caller_user}')
             base_url = "http://localhost/getsomefile"
             ir_attachment_data = {
-                    'res_model': 'crm.phonecall',
-                    'res_id': phonecall_id,
-                    'name': phonecall_data['name'],
-                    'type': 'url',
-                    'url': base_url.format(caller_user=caller_user, odoo_uniqueid=odoo_uniqueid.replace('.', '_'), odoo_filename=odoo_filename),
-                    'datas_fname': odoo_filename,
+                'res_model': 'crm.phonecall',
+                'res_id': phonecall_id,
+                'name': phonecall_data['name'],
+                'type': 'url',
+                'url': base_url.format(caller_user=caller_user, odoo_uniqueid=odoo_uniqueid.replace('.', '_'), odoo_filename=odoo_filename),
+                'datas_fname': odoo_filename,
             }
             attach_id = attach_obj.create(ir_attachment_data, context=context)
             phonecall_obj.write([phonecall_id], {'recording_id': attach_id}, context=context)
