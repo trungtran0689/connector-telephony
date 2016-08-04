@@ -33,6 +33,7 @@
     'data': [
       'views/crm_phonecall_view.xml',
     ],
+    'auto_install': True,
     'application': True,
     'installable': True,
 }
