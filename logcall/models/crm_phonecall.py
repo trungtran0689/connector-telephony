@@ -26,10 +26,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class CrmPhonecall(models.Model):
     _inherit = "crm.phonecall"
 
     recording_id = fields.Many2one('ir.attachment', string='Call Recording', readonly=True)
+
 
 class PhoneCommon(models.AbstractModel):
     _inherit = 'phone.common'
@@ -65,7 +67,7 @@ class PhoneCommon(models.AbstractModel):
 
         users = self.env['res.users'].search(
             [('login', 'in', caller_user)])
-	if not users:
+        if not users:
             users = self.env['res.users'].search(
                 [('internal_number', 'in', caller_user)])
 
@@ -78,7 +80,7 @@ class PhoneCommon(models.AbstractModel):
             params = self.pool.get('ir.config_parameter')
 # FIXME: Need to add an option to FreeSWITCH and Asterisk Click2Dial to have this option and use that.
 #            base_url = params.get_param('crm.voip.ucp_url', default='http://localhost/ucp?quietmode=1&module=cdr&command=download&msgid={odoo_uniqueid}&type=download&format=wav&ext={caller_user}')
-            base_url="http://localhost/getsomefile"
+            base_url = "http://localhost/getsomefile"
             ir_attachment_data = {
                     'res_model': 'crm.phonecall',
                     'res_id': phonecall_id,
@@ -86,8 +88,8 @@ class PhoneCommon(models.AbstractModel):
                     'type': 'url',
                     'url': base_url.format(caller_user=caller_user, odoo_uniqueid=odoo_uniqueid.replace('.', '_'), odoo_filename=odoo_filename),
                     'datas_fname': odoo_filename,
-                }
+            }
             attach_id = attach_obj.create(ir_attachment_data, context=context)
-            phonecall_obj.write(cr, uid, [phonecall_id], {'recording_id': attach_id}, context=context)
+            phonecall_obj.write([phonecall_id], {'recording_id': attach_id}, context=context)
 
         return True
