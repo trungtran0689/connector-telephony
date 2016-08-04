@@ -11,7 +11,7 @@
               'Odoo Community Association (OCA)',
     'license': 'AGPL-3',
     'depends': [
-        'crm_voip',
+        'crm_phone',
     ],
     'data': [
         'views/partner_view.xml',

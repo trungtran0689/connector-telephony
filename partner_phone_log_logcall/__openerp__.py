@@ -11,7 +11,7 @@
               'Odoo Community Association (OCA)',
     'license': 'AGPL-3',
     'depends': [
-        'asterisk_logcall',
+        'logcall',
         'partner_phone_log',
     ],
     'data': [
