@@ -30,9 +30,9 @@ try:
 except ImportError:
     import ESL
 # import sys
-import csv
 import StringIO
 import re
+import json
 
 _logger = logging.getLogger(__name__)
 
@@ -278,20 +278,17 @@ class freeswitch_server(orm.Model):
             cr, uid, context=context)
         calling_party_number = False
         try:
-            ret = fs_manager.api(
-                'show', "calls as delim | like callee_cid_num " +
-                str(user.internal_number))
-            f = StringIO.StringIO(ret.getBody())
-            reader = csv.DictReader(f, delimiter='|')
-            for row in reader:
-                if "uuid" not in row or row["uuid"] == "" or row["uuid"] == "uuid":
-                    break
-                if row["callstate"] not in ["EARLY", "ACTIVE", "RINGING"]:
-                    continue
-                if row["b_cid_num"] and row["b_cid_num"] is not None:
-                    calling_party_number = row["b_cid_num"]
-                elif row["cid_num"] and row["cid_num"] is not None:
-                    calling_party_number = row["cid_num"]
+            request = "channels like /" + re.sub(r'/', r':', user.resource) + \
+                ("/" if user.freeswitch_chan_type == "FreeTDM" else "@") + \
+                " as json"
+            ret = fs_manager.api('show', str(request))
+            f = json.load(StringIO.StringIO(ret.getBody()))
+            if int(f['row_count']) > 0:
+                if (f['rows'][0]['initial_cid_name'] == 'Odoo Connector' or
+                   f['rows'][0]['direction'] == 'inbound'):
+                       calling_party_number = f['rows'][0]['dest']
+                else:
+                    calling_party_number = f['rows'][0]['cid_num']
         except Exception, e:
             _logger.error(
                 "Error in the Status request to FreeSWITCH server %s"
@@ -391,7 +388,7 @@ class res_users(orm.Model):
         }
 
     _defaults = {
-        'freeswitch_chan_type': 'SIP',
+        'freeswitch_chan_type': 'user',
     }
 
     def _check_validity(self, cr, uid, ids):
@@ -442,7 +439,7 @@ class phone_common(orm.AbstractModel):
                 _('No callerID configured for the current user'))
 
         variable = ""
-        if user.freeswitch_chan_type == 'SIP':
+        if user.freeswitch_chan_type == 'user':
             # We can only have one alert-info header in a SIP request
             if user.alert_info:
                 variable += 'alert_info=' + user.alert_info
