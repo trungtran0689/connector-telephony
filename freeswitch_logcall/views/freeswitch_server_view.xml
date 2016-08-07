@@ -8,7 +8,7 @@
 <openerp>
 <data>
 
-        <record id="crm_phonecall_tree_view_recording_link" model="ir.ui.view">
+        <record id="freeswitch_logcall_extra_options" model="ir.ui.view">
             <field name="name">FreeSWITCH Servers</field>
             <field name="model">freeswitch.server</field>
             <field name="inherit_id" ref="freeswitch_click2dial.view_freeswitch_server_form"/>

@@ -33,7 +33,6 @@
     'data': [
         'views/freeswitch_server_view.xml',
     ],
-    'auto_install': True,
     'application': True,
     'installable': True,
 }

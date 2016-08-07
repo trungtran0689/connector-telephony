@@ -31,9 +31,8 @@
     'website': 'http://www.credativ.co.uk/',
     'depends': ['base_phone', 'crm_phone'],
     'data': [
-      'views/crm_phonecall_view.xml',
+        'views/crm_phonecall_view.xml',
     ],
-    'auto_install': True,
     'application': True,
     'installable': True,
 }
