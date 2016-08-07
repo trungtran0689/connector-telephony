@@ -37,7 +37,8 @@ class PhoneCommon(models.AbstractModel):
     _inherit = 'phone.common'
 
     @api.model
-    def _get_ucp_url(self): pass
+    def _get_ucp_url(self):
+        pass
 
     @api.model
     def log_call_and_recording(self, odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, context=None):

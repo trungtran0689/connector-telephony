@@ -32,7 +32,7 @@ class FreeSWITCHServer(models.Model):
 
     ucp_url = fields.Char(
         string='Script to download FreeSWITCH recordings', required=False,
-        default="http://localhost/get_file?filename={odoo_filename}",
+        default="https://localhost/get_file?filename={odoo_filename}",
         help="Macros allowed: {odoo_type} (inbound, outbound), {odoo_src}"
         "(source phon number}, {odoo_dst} (destination number), "
         "{odoo_duration} (length of call), {odoo_start} (start time of call "
@@ -47,4 +47,3 @@ class PhoneCommon(models.AbstractModel):
     def _get_ucp_url(self, users):
         fs_server = users[0].get_freeswitch_server_from_user()
         return fs_server.ucp_url
-
