@@ -45,6 +45,13 @@ class PhoneCommon(models.AbstractModel):
         phonecall_obj = self.env['crm.phonecall']
         attach_obj = self.env['ir.attachment']
 
+        tz = timezone(tz) if tz else utc
+        start_date = datetime.strptime(odoo_start, '%Y-%m-%d %H:%M:%S')
+        start_date = tz.localize(start_date)
+
+        start_time = mktime(start_date.timetuple())
+        odoo_start = start_date.astimezone(utc).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
         call_name_prefix = odoo_type == 'incoming' and "Call from %s" or "Call to %s"
@@ -56,11 +63,15 @@ class PhoneCommon(models.AbstractModel):
             'partner_id': False,
             'duration': int(odoo_duration) / 60.0,
             'state': 'done',
-            'start_time': odoo_start,
+            'start_time': start_time,
+            'date': odoo_start,
         }
 
         r = self.get_record_from_phone_number(caller_external)
-        if r[0] == 'res.partner':
+        if not r:
+            logger.warning("No partner found for number %s" % caller_external)
+            return phonecall_obj
+        elif r[0] == 'res.partner':
             phonecall_data['partner_id'] = r[1]
             if r[2]:
                 phonecall_data['name'] = call_name_prefix % (r[2],)
@@ -90,10 +101,17 @@ class PhoneCommon(models.AbstractModel):
                 'res_id': phonecall_id,
                 'name': phonecall_data['name'],
                 'type': 'url',
+                'mimetype': 'audio/wav',
                 'url': base_url.format(caller_user=caller_user, odoo_uniqueid=odoo_uniqueid.replace('.', '_'), odoo_filename=odoo_filename),
                 'datas_fname': odoo_filename,
             }
-            attach_id = attach_obj.create(ir_attachment_data, context=context)
-            phonecall_obj.write([phonecall_id], {'recording_id': attach_id}, context=context)
+            attach_id = attach_obj.create(ir_attachment_data)
+            phonecall_id.write({'recording_id': attach_id.id})
 
-        return True
+            message_format = _("Recorded %s call (%%sm)." % odoo_type)
+            record.message_post(
+                body=message_format % (int(odoo_duration) / 60,),
+                message_type='comment',
+                attachment_ids=attach_id._ids)
+
+    return phonecall_id
