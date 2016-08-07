@@ -44,6 +44,6 @@ class PhoneCommon(models.AbstractModel):
     _inherit = 'phone.common'
 
     @api.model
-    def _get_ucp_url(self, users):
+    def _get_ucp_url(self):
         fs_server = users.freeswitch_server_id
         return fs_server.ucp_url
