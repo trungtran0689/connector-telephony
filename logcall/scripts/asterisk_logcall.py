@@ -51,10 +51,6 @@ EOF
 
 """
 
-import xmlrpclib
-import sys
-from optparse import OptionParser
-
 __author__ = "Craig Gowing <craig.gowing@credativ.co.uk> & Alexis de Lattre <alexis.delattre@akretion.com>"
 __date__ = "February 2016"
 __version__ = "0.2"
@@ -94,8 +90,10 @@ options = [
     {'names': ('-w', '--password'), 'dest': 'password', 'type': 'string',
         'action': 'store', 'default': 'demo',
         'help': "Password of the OpenERP user. Default = 'demo'"},
+    {'names': ('-z', '--timezone'), 'dest': 'timezone', 'type': 'string',
+        'action': 'store', 'default': 'UTC',
+        'help': "The timezone associated with odoo_start"},
 ]
-
 
 def stdout_write(string):
     '''Wrapper on sys.stdout.write'''
@@ -114,7 +112,6 @@ def stderr_write(string):
     sys.stdout.flush()
     return True
 
-
 def main(options, arguments):
 
     # AGI passes parameters to the script on standard input
@@ -125,7 +122,7 @@ def main(options, arguments):
             break
         line = input_line.strip()
         try:
-            variable, value = line.split(':')
+            variable, value = line.split(':', 1)
         except:
             break
         if variable[:4] != 'agi_':  # All AGI parameters start with 'agi_'
@@ -140,15 +137,16 @@ def main(options, arguments):
     for variable in stdinput.keys():
         stderr_write("%s = %s\n" % (variable, stdinput.get(variable)))
 
-    odoo_type = stdinput['agi_arg_1']
-    odoo_src = stdinput['agi_arg_2']
-    odoo_dst = stdinput['agi_arg_3']
-    odoo_duration = stdinput['agi_arg_4']
-    odoo_start = stdinput['agi_arg_5']
-    odoo_filename = stdinput['agi_arg_6']
-    odoo_uniqueid = stdinput['agi_arg_7']
+    odoo_type = stdinput.get('agi_arg_1', '')
+    odoo_src = stdinput.get('agi_arg_2', '')
+    odoo_dst = stdinput.get('agi_arg_3', '')
+    odoo_duration = stdinput.get('agi_arg_4', '')
+    odoo_start = stdinput.get('agi_arg_5', '')
+    odoo_filename = stdinput.get('agi_arg_6', '')
+    odoo_uniqueid = stdinput.get('agi_arg_7', '')
 
     method = 'log_call_and_recording'
+    timezone = options.timezone
 
     res = False
     # Yes, this script can be used without "-s openerp_server" !
@@ -164,8 +162,8 @@ def main(options, arguments):
             odoo = odoorpc.ODOO(options.server, proto, options.port)
             odoo.login(options.database, options.username, options.password)
             res = odoo.execute(
-                'phone.common', 'log_call_and_recording', odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, arguments)
-            stdout_write('VERBOSE "Called method %s"\n' % method)
+                'phone.common', 'log_call_and_recording', odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, timezone, arguments)
+            stdout_write('VERBOSE "Called method %s, returned %s"\n' % (method, res))
         except:
             stdout_write(
                 'VERBOSE "Could not connect to OpenERP in JSON-RPC"\n')
@@ -182,14 +180,10 @@ def main(options, arguments):
         try:
             res = sock.execute(
                 options.database, options.userid, options.password,
-                'phone.common', 'log_call_and_recording', odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, arguments)
-            stdout_write('VERBOSE "Called method %s"\n' % method)
-        except Exception, e:
-            raise
+                'phone.common', 'log_call_and_recording', odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, timezone, arguments)
+            stdout_write('VERBOSE "Called method %s, returned %s"\n' % (method, res))
+        except:
             stdout_write('VERBOSE "Could not connect to OpenERP in XML-RPC"\n')
-        # To simulate a long execution of the XML-RPC request
-        # import time
-        # time.sleep(5)
 
     return True
 
