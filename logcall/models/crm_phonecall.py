@@ -37,6 +37,9 @@ class PhoneCommon(models.AbstractModel):
     _inherit = 'phone.common'
 
     @api.model
+    def _get_ucp_url(self): pass
+
+    @api.model
     def log_call_and_recording(self, odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, context=None):
         phonecall_obj = self.pool.get('crm.phonecall')
         attach_obj = self.pool.get('ir.attachment')
@@ -80,7 +83,7 @@ class PhoneCommon(models.AbstractModel):
             params = self.pool.get('ir.config_parameter')
 # FIXME: Need to add an option to FreeSWITCH and Asterisk Click2Dial to have this option and use that.
 #            base_url = params.get_param('crm.voip.ucp_url', default='http://localhost/ucp?quietmode=1&module=cdr&command=download&msgid={odoo_uniqueid}&type=download&format=wav&ext={caller_user}')
-            base_url = "http://localhost/getsomefile"
+            base_url = _get_ucp_url(users)
             ir_attachment_data = {
                 'res_model': 'crm.phonecall',
                 'res_id': phonecall_id,
