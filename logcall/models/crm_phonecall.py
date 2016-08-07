@@ -21,9 +21,6 @@
 ##############################################################################
 
 from openerp import models, fields, api
-from datetime import datetime
-from pytz import timezone, utc
-from time import mktime
 import logging
 
 
@@ -48,15 +45,6 @@ class PhoneCommon(models.AbstractModel):
         phonecall_obj = self.env['crm.phonecall']
         attach_obj = self.env['ir.attachment']
 
-        tz = timezone(tz) if tz else utc
-        try:
-            start_date = datetime.strptime(odoo_start, '%Y-%m-%d %H:%M:%S')
-            start_date = tz.localize(start_date)
-            start_time = mktime(start_date.timetuple())
-            odoo_start = start_date.astimezone(utc).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        except:
-            pass
-
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
         call_name_prefix = odoo_type == 'incoming' and "Call from %s" or "Call to %s"
@@ -68,7 +56,6 @@ class PhoneCommon(models.AbstractModel):
             'partner_id': False,
             'duration': int(odoo_duration) / 60.0,
             'state': 'done',
-            'start_time': start_time,
             'date': odoo_start,
         }
 
