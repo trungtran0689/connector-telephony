@@ -45,5 +45,5 @@ class PhoneCommon(models.AbstractModel):
 
     @api.model
     def _get_ucp_url(self, users):
-        fs_server = users[0].freeswitch_server_id
+        fs_server = users.freeswitch_server_id
         return fs_server.ucp_url
