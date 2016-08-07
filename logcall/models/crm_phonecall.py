@@ -78,7 +78,7 @@ class PhoneCommon(models.AbstractModel):
         if users:
             phonecall_data['user_id'] = users[0]
 
-        phonecall_id = phonecall_obj.create(phonecall_data, context=context)
+        phonecall_id = phonecall_obj.create(phonecall_data)
 
         if odoo_filename:
             params = self.pool.get('ir.config_parameter')
