@@ -49,7 +49,7 @@ class PhoneCommon(models.AbstractModel):
         attach_obj = self.env['ir.attachment']
 
         tz = timezone(tz) if tz else utc
-        odoo_start = datetime(1970, 1, 1, tzinfo=tz) + timedelta(seconds=odoo_start)
+        odoo_start = datetime(1970, 1, 1, tzinfo=tz) + timedelta(seconds=float(odoo_start))
 
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
