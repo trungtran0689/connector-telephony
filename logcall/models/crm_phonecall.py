@@ -70,10 +70,10 @@ class PhoneCommon(models.AbstractModel):
                 phonecall_data['name'] = call_name_prefix % (r[2],)
 
         users = self.env['res.users'].search(
-            [('login', 'in', caller_user)])
+            [('login', 'in', caller_user.split(','))])
         if not users:
             users = self.env['res.users'].search(
-                [('internal_number', 'in', caller_user)])
+                [('internal_number', 'in', caller_user.split(','))])
 
         if users:
             phonecall_data['user_id'] = users[0]
