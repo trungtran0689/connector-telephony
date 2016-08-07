@@ -53,10 +53,9 @@ class PhoneCommon(models.AbstractModel):
             start_date = datetime.strptime(odoo_start, '%Y-%m-%d %H:%M:%S')
             start_date = tz.localize(start_date)
             start_time = mktime(start_date.timetuple())
+            odoo_start = start_date.astimezone(utc).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         except:
             pass
-
-        odoo_start = start_date.astimezone(utc).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
