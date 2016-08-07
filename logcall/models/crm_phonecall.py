@@ -93,7 +93,7 @@ class PhoneCommon(models.AbstractModel):
             params = self.pool.get('ir.config_parameter')
 # FIXME: Need to add an option to FreeSWITCH and Asterisk Click2Dial to have this option and use that.
 #            base_url = params.get_param('crm.voip.ucp_url', default='http://localhost/ucp?quietmode=1&module=cdr&command=download&msgid={odoo_uniqueid}&type=download&format=wav&ext={caller_user}')
-            base_url = self._get_ucp_url(users)
+            base_url = self._get_ucp_url(users[0])
             ir_attachment_data = {
                 'res_model': 'crm.phonecall',
                 'res_id': phonecall_id,
