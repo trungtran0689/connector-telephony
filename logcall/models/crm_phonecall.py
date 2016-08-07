@@ -42,8 +42,8 @@ class PhoneCommon(models.AbstractModel):
 
     @api.model
     def log_call_and_recording(self, odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, context=None):
-        phonecall_obj = self.pool.get('crm.phonecall')
-        attach_obj = self.pool.get('ir.attachment')
+        phonecall_obj = self.env['crm.phonecall']
+        attach_obj = self.env['ir.attachment']
 
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
