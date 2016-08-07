@@ -28,10 +28,10 @@
     'license': 'AGPL-3',
     'summary': 'Necessary bridge between log-call and FreeSWITCH Click2dial',
     'author': "Trever L. Adams",
-    'website': 'http://www.credativ.co.uk/',
-    'depends': ['logcall'],
+    'website': '',
+    'depends': ['logcall', 'freeswitch_click2dial'],
     'data': [
-      'views/freeswitch_server_view.xml',
+        'views/freeswitch_server_view.xml',
     ],
     'auto_install': True,
     'application': True,
