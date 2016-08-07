@@ -21,6 +21,9 @@
 ##############################################################################
 
 from openerp import models, fields, api
+from datetime import datetime
+from pytz import timezone, utc
+from time import mktime
 import logging
 
 
@@ -44,6 +47,9 @@ class PhoneCommon(models.AbstractModel):
     def log_call_and_recording(self, odoo_type, odoo_src, odoo_dst, odoo_duration, odoo_start, odoo_filename, odoo_uniqueid, tz=None):
         phonecall_obj = self.env['crm.phonecall']
         attach_obj = self.env['ir.attachment']
+
+        tz = timezone(tz) if tz else utc
+        odoo_start = datetime(1970, 1, 1, tzinfo=tz) + timedelta(seconds=odoo_start)
 
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
