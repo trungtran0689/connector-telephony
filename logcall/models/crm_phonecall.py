@@ -21,7 +21,8 @@
 ##############################################################################
 
 from openerp import models, fields, api
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from pytz import timezone, utc
 from time import mktime
 import logging
 
