@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-# (c) 2016 credativ ltd.
+# (c) 2016 credativ ltd. - Ondřej Kuzník
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'Show phonecalls on partner',
-    'summary': 'Adds a phonecall log to partner',
+    'name': 'Show phonecalls on HR Applicant',
+    'summary': 'Adds a phonecall log to HR Applicant',
     'version': '9.0.1.0.0',
-    'category': 'Customer Relationship Management',
+    'category': 'Human Resources',
     'author': 'credativ ltd., '
               'Odoo Community Association (OCA)',
     'license': 'AGPL-3',
     'depends': [
-        'crm_phone',
+        'logcall',
+        'hr_recruitment_phone',
     ],
     'data': [
-        'views/partner_view.xml',
+        'views/recruitment_view.xml',
     ],
     'application': True,
     'installable': True,

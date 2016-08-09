@@ -20,7 +20,7 @@
 #
 ##############################################################################
 
-from openerp import models, fields, api
+from openerp import models, fields, api, _
 from datetime import datetime, timedelta
 from pytz import timezone, utc
 from time import mktime
@@ -50,6 +50,7 @@ class PhoneCommon(models.AbstractModel):
 
         tz = timezone(tz) if tz else utc
         odoo_start = datetime(1970, 1, 1, tzinfo=tz) + timedelta(seconds=float(odoo_start))
+        odoo_end = odoo_start + timedelta(seconds=float(odoo_duration))
 
         caller_user, caller_external = odoo_type == 'incoming' and (odoo_dst, odoo_src) or (odoo_src, odoo_dst)
 
@@ -60,9 +61,10 @@ class PhoneCommon(models.AbstractModel):
             'name': call_name_prefix % (caller_external,),
             'opportunity_id': False,
             'partner_id': False,
-            'duration': int(odoo_duration) / 60.0,
+            'end_date': odoo_end,
             'state': 'done',
             'date': odoo_start,
+            'direction': 'inbound' if odoo_type == 'incoming' else 'outbound'
         }
 
         r = self.get_record_from_phone_number(caller_external)
@@ -77,6 +79,12 @@ class PhoneCommon(models.AbstractModel):
             phonecall_data['opportunity_id'] = r[1]
             if r[2]:
                 phonecall_data['name'] = call_name_prefix % (r[2],)
+        elif r[0] == 'hr.applicant':
+            phonecall_data['partner_id'] = r[1]
+            if r[2]:
+                phonecall_data['name'] = call_name_prefix % (r[2],)
+        record = self.env[r[0]].browse(r[1])
+        logger.info("r[0] is %s", r[0])
 
         users = self.env['res.users'].search(
             [('login', 'in', caller_user.split(','))])
@@ -85,18 +93,15 @@ class PhoneCommon(models.AbstractModel):
                 [('internal_number', 'in', caller_user.split(','))])
 
         if users:
-            phonecall_data['user_id'] = users[0]
+            phonecall_data['user_id'] = users[0].id
 
         phonecall_id = phonecall_obj.create(phonecall_data)
 
         if odoo_filename:
-            params = self.pool.get('ir.config_parameter')
-# FIXME: Need to add an option to FreeSWITCH and Asterisk Click2Dial to have this option and use that.
-#            base_url = params.get_param('crm.voip.ucp_url', default='http://localhost/ucp?quietmode=1&module=cdr&command=download&msgid={odoo_uniqueid}&type=download&format=wav&ext={caller_user}')
             base_url = self._get_ucp_url(users)
             ir_attachment_data = {
                 'res_model': 'crm.phonecall',
-                'res_id': phonecall_id,
+                'res_id': phonecall_id.id,
                 'name': phonecall_data['name'],
                 'type': 'url',
                 'mimetype': 'audio/wav',
@@ -112,4 +117,4 @@ class PhoneCommon(models.AbstractModel):
                 message_type='comment',
                 attachment_ids=attach_id._ids)
 
-        return phonecall_id
+        return phonecall_id.id

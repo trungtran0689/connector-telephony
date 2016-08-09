@@ -1,2 +1,2 @@
-from . import freeswitch_server
+from . import asterisk_server
 
